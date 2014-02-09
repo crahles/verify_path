@@ -1,4 +1,4 @@
-# verify_path [![Build Status](https://drone.io/github.com/crahles/verify_path/status.png)](https://drone.io/github.com/crahles/verify_path/latest)
+# verify_path [![Build Status](https://drone.io/github.com/crahles/verify_path/status.png)](https://drone.io/github.com/crahles/verify_path/latest) ![coverage](https://img.shields.io/badge/coverage-95.5%-green.png "coverage")
 
 verify_path is a simple util to check if there are paths in your input which dont exist anymore (old entries in crontab).
 
