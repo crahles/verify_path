@@ -3,13 +3,11 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"regexp"
 	"strings"
-	"sync"
 )
-
-var wg sync.WaitGroup
 
 func main() {
 	regex, err := regexp.Compile(`\/var\/www.*?\s`)
@@ -17,28 +15,38 @@ func main() {
 		panic(err.Error())
 	}
 
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		line, err := reader.ReadString('\n')
-		if err != nil {
-			break
-		}
-		if regex.MatchString(line) {
-			wg.Add(1)
-			path := strings.TrimSuffix(regex.FindString(line), " ")
-			go checkPathExists(path)
+	matchingLines := readMatchingLines(os.Stdin, regex)
+	outputChannel := make(chan string)
+
+	for _, line := range matchingLines {
+		path := strings.TrimSuffix(regex.FindString(line), " ")
+		go checkPathExists(outputChannel, path)
+	}
+
+	for i := 0; i <= len(matchingLines); i++ {
+		if msg := <-outputChannel; msg != "" {
+			fmt.Println(msg)
 		}
 	}
-	wg.Wait()
 }
 
-func checkPathExists(path string) bool {
-	if _, err := os.Stat(path); err != nil {
-		if os.IsNotExist(err) {
-			fmt.Println("Path " + path + " does not exists!")
-			return false
+func readMatchingLines(input io.Reader, regex *regexp.Regexp) []string {
+	var lines []string
+	scanner := bufio.NewScanner(input)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if regex.MatchString(line) {
+			lines = append(lines, line)
 		}
 	}
-	defer wg.Done()
-	return true
+	return lines
+}
+
+func checkPathExists(cs chan string, path string) {
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			cs <- "Path " + path + " does not exists!"
+		}
+	}
+	cs <- ""
 }

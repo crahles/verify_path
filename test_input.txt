@@ -1,0 +1,11 @@
+
+
+# Begin Whenever generated tasks for: xxxnmail
+0,15,30,45 * * * * /bin/bash -l -c 'cd /var/www/xxxmail/releases/20130114112251 &&  RACK_ENV=production kuechenmail_bundle exec rake parse_mails --trace >> log/cron.log 2>> log/cron-error.log'
+
+# End Whenever generated tasks for: xxxmail
+
+# Begin Whenever generated tasks for: yyy_to_qv
+15 7 * * * /bin/bash -l -c 'cd /var/www/yyy_to_qv/releases/20131022103053 && rack_env=production yyy_to_qv_bundle exec rake transfer --trace >> log/cron.log 2>> log/cron-error.log'
+
+# End Whenever generated tasks for: yyy_to_qv
